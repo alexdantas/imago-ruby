@@ -74,7 +74,9 @@ class Window
 
   # Erases all of the Window's contents
   def clear
-    @win.clear
+    # Y U NO WORK
+    # @win.clear
+    Curses::clear
   end
 
   # Commits the changes on the Window.

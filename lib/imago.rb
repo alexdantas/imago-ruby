@@ -1,10 +1,11 @@
 require 'imago/engine'
 require 'imago/window'
 require 'imago/popup'
+require 'imago/block'
 
 module Imago
   # All the windows of the game
-  @@layout = {}
+  LAYOUT = {}
 
   # Main function of the game.
   # Initializes engine and runs the main game loop.
@@ -16,7 +17,9 @@ module Imago
     win = Window.new(0, 0, 80, 24)
     win.background '.'
     win.box('a', 'b')
-    @@layout[:main] = win
+    LAYOUT[:game] = win
+
+    block = Block.new(0, 0, "[]")
 
     finished = false
     while not finished
@@ -24,7 +27,13 @@ module Imago
       case c
       when 'q'
         finished = true
+      when Curses::KEY_LEFT
+        block.x -= 1
+      when Curses::KEY_RIGHT
+        block.x += 1
       end
+      LAYOUT[:game].clear
+      block.draw
     end
 
     Engine::exit
