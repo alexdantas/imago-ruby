@@ -1,6 +1,7 @@
-require 'curses'
+require 'ffi-ncurses'
+include FFI::NCurses
 
-# The main interface with Curses.
+# The main interface with
 #
 # This acts as a middleman, abstracting away Curses' details.
 class Engine
@@ -20,14 +21,13 @@ class Engine
   # Initializes Ncurses with minimal +width+ and +height+.
   #
   def self.init(min_width=nil, min_height=nil)
-    @has_colors = nil
 
-    @screen = Curses::init_screen
-    return nil if not @screen
+    initscr
+    return nil if not stdscr
 
     if min_width and min_height
-      cur_width  = @screen.maxx
-      cur_height = @screen.maxy
+      cur_width  = COLS
+      cur_height = LINES
 
       if cur_width < @width or cur_height < @height
         self.exit
@@ -37,63 +37,63 @@ class Engine
       end
     end
 
-    @has_colors = Curses.has_colors?
+    @has_colors = has_colors
     if @has_colors
-      Curses.start_color
-      Curses.use_default_colors # will use default background
+      start_color
+      use_default_colors # will use default background
 
       # Initializes:   constant          foreground             bg
-      Curses.init_pair(Colors[:white],   Curses::COLOR_BLACK,   -1)
-      Curses.init_pair(Colors[:blue],    Curses::COLOR_BLUE,    -1)
-      Curses.init_pair(Colors[:red],     Curses::COLOR_RED,     -1)
-      Curses.init_pair(Colors[:green],   Curses::COLOR_GREEN,   -1)
-      Curses.init_pair(Colors[:magenta], Curses::COLOR_MAGENTA, -1)
-      Curses.init_pair(Colors[:yellow],  Curses::COLOR_YELLOW,  -1)
-      Curses.init_pair(Colors[:cyan],    Curses::COLOR_CYAN,    -1)
+      init_pair(Colors[:white],   COLOR_BLACK,   -1)
+      init_pair(Colors[:blue],    COLOR_BLUE,    -1)
+      init_pair(Colors[:red],     COLOR_RED,     -1)
+      init_pair(Colors[:green],   COLOR_GREEN,   -1)
+      init_pair(Colors[:magenta], COLOR_MAGENTA, -1)
+      init_pair(Colors[:yellow],  COLOR_YELLOW,  -1)
+      init_pair(Colors[:cyan],    COLOR_CYAN,    -1)
     end
 
-    Curses::cbreak
-    Curses::curs_set 0
-    Curses::noecho
-    Curses::nonl
-    Curses::stdscr.keypad = true # extra keys
+    cbreak
+    curs_set 0
+    noecho
+    nonl
+    keypad(stdscr, true) # extra keys
   end
 
-  def width
-    return Curses::cols
+  def self.width
+    return COLS
   end
 
-  def height
-    return Curses::lines
+  def self.height
+    return LINES
   end
 
   def self.exit
-    Curses::refresh
-    Curses::close_screen
+    refresh
+    endwin
   end
 
   def set_color color
     if @has_colors
-      @screen.attron Curses::color_pair(color)
+      attron COLOR_PAIR(color)
       return self
-    else
-      return nil
     end
+
+    return nil
   end
 
-  def getchar
-    return Curses::getch
+  def self.getchar
+    return getch
   end
 
   # How many milliseconds we wait for a key to be pressed.
   #
-  # * If +timeout+ is 0, will run with blocking input.
-  # * If +timeout+ is less than zero, will run with nonblocking input.
-  # * If +timeout+ is greater than zero, will wait +timeout+ miliseconds.
+  # * If +time+ is 0, will run with blocking input.
+  # * If +time+ is less than zero, will run with nonblocking input.
+  # * If +time+ is greater than zero, will wait +time+ miliseconds.
   #
-  # If +timeout+ elapsed and user didn't press anything, will return +nil+.
-  def self.timeout timeout
-    Curses::timeout = timeout
+  # If +time+ elapsed and user didn't press anything, will return +nil+.
+  def self.timeout time
+    wtimeout(stdscr, time)
   end
 end
 

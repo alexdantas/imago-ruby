@@ -1,11 +1,12 @@
-require 'imago/engine'
+require 'ffi-ncurses'
+include FFI::NCurses
 
 # A segment of the terminal window.
 #
 # BUG WARNING HACK FUCK
 # Whenever I use @win.attrset/@win.setpos/@win.addch
 # it doesn't work at all.
-# Apparently, when I do this, Curses::getch clears up
+# Apparently, when I do this, getch clears up
 # the entire window.
 #
 # DO NOT DO THIS
@@ -15,22 +16,22 @@ class Window
 
   # Creates a Window at `x` `y` `w` `h`.
   def initialize(x, y, w, h)
-    @win = Curses::Window.new(h, w, y, x)
+    @win = newwin(h, w, y, x)
     @width  = w
     @height = h
   end
 
   # Sets the current color of the Window.
   def set_color color
-    Curses::attrset(Curses::color_pair color)
+    attrset COLOR_PAIR(color)
   end
 
   # Executes a block of code encapsulated within a color on/off.
   # Note that the color can be overrided.
   def with_color(color=nil)
-    Curses::attron(Curses::color_pair color) if color
+    wattron(@win, COLOR_PAIR(color)) if color
     yield
-    Curses::attroff(Curses::color_pair color) if color
+    wattroff(@win, COLOR_PAIR(color)) if color
   end
 
   # Puts a character +c+ on (+x+, +y+) with optional +color+.
@@ -39,8 +40,8 @@ class Window
     return if y < 0 or y >= @height
 
     self.with_color color do
-      Curses::setpos(@win.begy + y, @win.begx + x)
-      Curses::addch c
+      wmove(@win, y, x)
+      waddch(@win,  c)
     end
   end
 
@@ -52,8 +53,8 @@ class Window
     self.with_color color do
 #      @win.setpos(@win.begy + y, @win.begx + x)
 #      @win.addstr str
-      Curses::setpos(@win.begy + y, @win.begx + x)
-      Curses::addstr str
+      wmove(@win, y, x)
+      waddstr(@win, str)
     end
   end
 
@@ -74,26 +75,22 @@ class Window
 
   # Erases all of the Window's contents
   def clear
-    # Y U NO WORK
-    # @win.clear
-    Curses::clear
+    werase @win
   end
 
   # Commits the changes on the Window.
   def refresh
-    # Y U NO WORK
-    # @win.refresh
-    Curses::refresh
+    wrefresh @win
   end
 
   # Moves window so that the upper-left corner is at `x` `y`.
   def move(x, y)
-    @win.move(y, x)
+    wmove(@win, y, x)
   end
 
   # Resizes window to +width+ and +h+eight.
   def resize(w, h)
-    @win.resize(h, w)
+    wresize(@win, h, w)
     @width  = w
     @height = h
   end
@@ -105,12 +102,13 @@ class Window
   # * If `delay` is positive, waits for `delay` milliseconds and
   #   returns ERR of no input.
   def timeout(delay=-1)
-    @win.timeout = delay
+    wtimeout(@win, delay)
   end
 
+  # Sets the background char of the window.
   def background char
-    @win.bkgd char
-    @win.refresh
+    wbkgd(@win, char.ord)
+    self.refresh
   end
 
   # Sets the Window border.
@@ -119,9 +117,9 @@ class Window
   # * If only the first 2 arguments are set, they are the vertical
   #   and horizontal chars.
   #
-  def box(horizontal=0, vertical=0)
-    @win.box(horizontal, vertical)
-    @win.refresh
+  def border(horizontal=0, vertical=0)
+    box(@win, vertical.ord, horizontal.ord)
+    self.refresh
   end
 end
 

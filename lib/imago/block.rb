@@ -1,4 +1,5 @@
 require 'imago'
+require 'imago/engine'
 
 # A single Tetris block (brick that builds the pieces).
 class Block

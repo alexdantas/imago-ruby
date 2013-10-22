@@ -1,7 +1,7 @@
 require 'imago/engine'
 require 'imago/window'
 require 'imago/popup'
-require 'imago/block'
+require 'imago/piece'
 
 module Imago
   # All the windows of the game
@@ -16,24 +16,29 @@ module Imago
 
     win = Window.new(0, 0, 80, 24)
     win.background '.'
-    win.box('a', 'b')
+    win.border('a', 'b')
     LAYOUT[:game] = win
 
-    block = Block.new(0, 0, "[]")
+    piece = Piece.new(0, 0, Piece::Type[:S])
 
     finished = false
     while not finished
-      c = Curses::getch
+      c = getch
       case c
-      when 'q'
+      when 'q'.ord
         finished = true
-      when Curses::KEY_LEFT
-        block.x -= 1
-      when Curses::KEY_RIGHT
-        block.x += 1
+      when KEY_LEFT
+        piece.x -= 1
+      when KEY_RIGHT
+        piece.x += 1
+      when KEY_UP
+        piece.y -= 1
+      when KEY_DOWN
+        piece.y += 1
       end
       LAYOUT[:game].clear
-      block.draw
+      LAYOUT[:game].background '.'
+      piece.draw
     end
 
     Engine::exit

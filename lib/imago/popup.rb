@@ -1,4 +1,5 @@
 require 'imago/window'
+require 'imago/engine'
 
 # A simple centralized popup on the terminal.
 class Popup < Window
@@ -10,9 +11,7 @@ class Popup < Window
   def initialize(title, text, border=true)
     @title = title
     @text = []
-    text.each_line do |line|
-      @text += [line.chomp]
-    end
+    text.each_line { |line| @text += [line.chomp] }
 
     max_width  = title.length
     max_height = 1
@@ -25,8 +24,8 @@ class Popup < Window
     max_width  += 2 # left-right borders
     max_height += 1 # down border
 
-    x = Curses::cols/2  - max_width/2
-    y = Curses::lines/2 - max_height/2
+    x = Engine::width/2  - max_width/2
+    y = Engine::height/2 - max_height/2
 
     super(x, y, max_width, max_height)
     self.background ' '
@@ -46,7 +45,7 @@ class Popup < Window
   def show
     finished = false
     while not finished
-      c = Curses::getch
+      c = getch
 
       # This way will end no matter what the user presses
       finished = true
@@ -57,8 +56,8 @@ class Popup < Window
       # end
     end
 
-    Curses::stdscr.clear
-    Curses::stdscr.refresh
+    stdscr.clear
+    stdscr.refresh
     return false
   end
 end
