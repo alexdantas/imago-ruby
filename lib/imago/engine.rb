@@ -85,9 +85,14 @@ class Engine
     return Curses::getch
   end
 
-  # +timeout+ says how many milliseconds we wait for a key to be
-  # pressed.
-  def timeout timeout
+  # How many milliseconds we wait for a key to be pressed.
+  #
+  # * If +timeout+ is 0, will run with blocking input.
+  # * If +timeout+ is less than zero, will run with nonblocking input.
+  # * If +timeout+ is greater than zero, will wait +timeout+ miliseconds.
+  #
+  # If +timeout+ elapsed and user didn't press anything, will return +nil+.
+  def self.timeout timeout
     Curses::timeout = timeout
   end
 end
