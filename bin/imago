@@ -1,3 +1,14 @@
 #!/usr/bin/env ruby
 
 require 'imago'
+require 'imago/settings'
+
+$settings = nil
+
+begin
+  $settings = Settings.new
+  $settings.parse ARGV
+
+  Imago::run
+end
+

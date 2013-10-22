@@ -1,4 +1,6 @@
 # coding: utf-8
+
+# requiring `lib` on load path
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'imago/version'
