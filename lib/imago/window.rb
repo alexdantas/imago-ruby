@@ -1,15 +1,7 @@
 require 'ffi-ncurses'
 include FFI::NCurses
 
-# A segment of the terminal window.
-#
-# BUG WARNING HACK FUCK
-# Whenever I use @win.attrset/@win.setpos/@win.addch
-# it doesn't work at all.
-# Apparently, when I do this, getch clears up
-# the entire window.
-#
-# DO NOT DO THIS
+# A 2D segment of the terminal window.
 #
 class Window
   attr_reader :width, :height

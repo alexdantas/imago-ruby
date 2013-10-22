@@ -14,12 +14,9 @@ module Imago
     Engine::init
     Engine::timeout 50
 
-    win = Window.new(0, 0, 80, 24)
-    win.background '.'
-    win.border('a', 'b')
-    LAYOUT[:game] = win
+    LAYOUT[:game] = Window.new(0, 0, 80, 24)
 
-    piece = Piece.new(0, 0, Piece::Type[:S])
+    piece = Piece.new(5, 5, Piece::Type[:S], LAYOUT[:game])
 
     finished = false
     while not finished
@@ -38,7 +35,9 @@ module Imago
       end
       LAYOUT[:game].clear
       LAYOUT[:game].background '.'
+      LAYOUT[:game].border
       piece.draw
+      LAYOUT[:game].refresh
     end
 
     Engine::exit

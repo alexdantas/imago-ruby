@@ -5,16 +5,20 @@ require 'imago/engine'
 class Block
   attr_accessor :x, :y
 
-  # Creates a block with +appearance+ (string that represents it onscreen).
-  def initialize(x, y, appearance)
+  # Creates a block with +appearance+ on +window+.
+  #
+  # +appearance+ is the string that represents it onscreen.
+  # +window+ is the Window on which it will be shown.
+  def initialize(x, y, appearance, window)
     @x = x
     @y = y
     @appearance = appearance
+    @window = window
   end
 
-  # Shows this block on the main game screen.
+  # Shows this block on it's Window.
   def draw
-    Imago::LAYOUT[:game].mvaddstr(@x, @y, @appearance)
+    @window.mvaddstr(@x, @y, @appearance)
   end
 end
 

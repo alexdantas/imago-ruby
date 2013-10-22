@@ -23,8 +23,10 @@ class Piece
     :T => 7
   }.freeze
 
-  # Creates a new piece of +type+.
-  def initialize(x, y, type)
+  # Creates a new piece of +type+, that will be shown on +window+.
+  #
+  # See Window class.
+  def initialize(x, y, type, window)
     @x = x
     @y = y
     @type = type
@@ -35,10 +37,14 @@ class Piece
 
     # Building it's blocks based on it's type.
     # (each piece has exactly 4 blocks)
-    4.times do
-      block = Block.new(0, 0, @appearance)
-      @blocks.push block
-    end
+    block = Block.new(@x, @y, @appearance, window)
+    @blocks.push block
+    block = Block.new(@x+2, @y, @appearance, window)
+    @blocks.push block
+    block = Block.new(@x+4, @y, @appearance, window)
+    @blocks.push block
+    block = Block.new(@x, @y+1, @appearance, window)
+    @blocks.push block
   end
 
   # Draws the entire piece on the screen.
