@@ -1,4 +1,5 @@
 require 'imago/block'
+require 'imago/pieces_definition'
 
 # A single Tetris piece.
 #
@@ -14,13 +15,13 @@ class Piece
   # [][]      [][]  [][]  []  [][]  [][]    []
   #   S        Z     O     I    L    J      T
   Type = {
-    :S => 1,
-    :Z => 2,
-    :O => 3,
-    :I => 4,
-    :L => 5,
-    :J => 6,
-    :T => 7
+    :O => 0,
+    :I => 1,
+    :L => 2,
+    :J => 3,
+    :S => 4,
+    :Z => 5,
+    :T => 6
   }.freeze
 
   # Creates a new piece of +type+, that will be shown on +window+.
@@ -36,15 +37,31 @@ class Piece
     @blocks = []
 
     # Building it's blocks based on it's type.
-    # (each piece has exactly 4 blocks)
-    block = Block.new(@x, @y, @appearance, window)
-    @blocks.push block
-    block = Block.new(@x+2, @y, @appearance, window)
-    @blocks.push block
-    block = Block.new(@x+4, @y, @appearance, window)
-    @blocks.push block
-    block = Block.new(@x, @y+1, @appearance, window)
-    @blocks.push block
+    #
+    # Each piece definition is a 5x5 matrix with values 0, 1 and 2.
+    # It contains the piece's shape.
+    #
+    # * 0 means an empty slot, will be ignored
+    # * 1 means a block, will be inserted
+    # * 2 means the pivot block, nothing special
+    k = 0
+
+    5.times do |i|
+      5.times do |j|
+        if $global_pieces[@type][@rotation][j][i] != 0
+
+          # we multiply by 2 for pretty-printing on the terminal
+          block_x = (@x + i) * 2
+          block_y = (@y + j)
+
+          block = Block.new(block_x, block_y, @appearance, window)
+          @blocks.push block
+
+          k += 1
+        end
+      end
+    end
+
   end
 
   # Draws the entire piece on the screen.
@@ -52,6 +69,22 @@ class Piece
     @blocks.each do |block|
       block.draw
     end
+  end
+
+  # Drops piece by one tile.
+  def soft_drop
+    @y += 1
+    @blocks.each { |block| block.y += 1 }
+  end
+
+  # Moves Piece sideways.
+  #
+  # 0 is left, 1 is right.
+  def move_sideways direction
+    delta = (direction == 0) ? -1 : 1
+
+    @x += delta
+    @blocks.each { |block| block.x += delta }
   end
 end
 

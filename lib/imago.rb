@@ -25,14 +25,13 @@ module Imago
       when 'q'.ord
         finished = true
       when KEY_LEFT
-        piece.x -= 1
+        piece.move_sideways 0
       when KEY_RIGHT
-        piece.x += 1
-      when KEY_UP
-        piece.y -= 1
+        piece.move_sideways 1
       when KEY_DOWN
-        piece.y += 1
+        piece.soft_drop
       end
+
       LAYOUT[:game].clear
       LAYOUT[:game].background '.'
       LAYOUT[:game].border
