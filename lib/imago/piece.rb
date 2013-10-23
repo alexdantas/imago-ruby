@@ -24,6 +24,8 @@ class Piece
     :T => 6
   }.freeze
 
+  attr_reader :blocks
+
   # Creates a new piece of +type+, that will be shown on +window+.
   #
   # See Window class.
